@@ -1,5 +1,7 @@
 package com.arao.imagetrecking.presentation;
 
+import com.arao.imagetrecking.domain.TrackImagesUseCase;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -7,8 +9,8 @@ import dagger.Provides;
 public class PresentationModule {
 
     @Provides
-    ImagesPresenter imagesPresenter() {
-        return new ImagesPresenter();
+    ImagesPresenter imagesPresenter(TrackImagesUseCase trackImagesUseCase) {
+        return new ImagesPresenter(trackImagesUseCase);
     }
 
 }

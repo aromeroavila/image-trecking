@@ -3,15 +3,18 @@ package com.arao.imagetrecking.presentation;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.arao.imagetrecking.R;
 import com.arao.imagetrecking.di.AppComponent;
 import com.arao.imagetrecking.di.DaggerAppComponent;
+import com.arao.imagetrecking.domain.ImagesViewState;
 
 import javax.inject.Inject;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class ImagesActivity extends AppCompatActivity implements ImagesView {
 
@@ -39,6 +42,22 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
         imagesPresenter.finalise();
     }
 
+    @Override
+    public void renderState(ImagesViewState state) {
+        switch (state.getScreenState()) {
+            case INITIAL:
+                break;
+            case IN_PROGRESS:
+                startButton.setVisibility(GONE);
+                loadingIndicator.setVisibility(VISIBLE);
+                break;
+            case SUCESS:
+                break;
+            case ERROR:
+                break;
+        }
+    }
+
     private void resolveDependencies() {
         AppComponent appComponent = DaggerAppComponent.create();
         appComponent.inject(this);
@@ -46,13 +65,7 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
 
     private void initViews() {
         startButton = (Button) findViewById(R.id.start_button);
-        // TODO Replace by lambda
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imagesPresenter.onStartButtonPressed();
-            }
-        });
+        startButton.setOnClickListener(v -> imagesPresenter.onStartButtonPressed());
         loadingIndicator = (ProgressBar) findViewById(R.id.loading_progress_bar);
         contentRecycler = (RecyclerView) findViewById(R.id.content_recycler);
     }
