@@ -1,6 +1,7 @@
 package com.arao.imagetrecking.presentation;
 
 import com.arao.imagetrecking.domain.ImagesViewState;
+import com.arao.imagetrecking.domain.ScreenState;
 import com.arao.imagetrecking.domain.TrackImagesUseCase;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -23,10 +24,14 @@ class ImagesPresenter {
     }
 
     void onStartButtonPressed() {
-        stateDisposable = trackImagesUseCase.startTrackingImages()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::onStateChange);
+        if (imagesView.isLocationPermissionGranted()) {
+            stateDisposable = trackImagesUseCase.startTrackingImages()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::onStateChange);
+        } else {
+            imagesView.requestLocationPermissions();
+        }
     }
 
     void finalise() {
@@ -34,8 +39,31 @@ class ImagesPresenter {
         stateDisposable.dispose();
     }
 
+    void onRequestPermissionResult(int[] grantResults) {
+        if (grantResults.length > 0) {
+            boolean allPermissionsGranted = true;
+            for (int grantResult : grantResults) {
+                if (grantResult != 0) {
+                    allPermissionsGranted = false;
+                }
+            }
+            if (allPermissionsGranted) {
+                onStartButtonPressed();
+            } else {
+                onPermissionRequestDenied();
+            }
+        } else {
+            onPermissionRequestDenied();
+        }
+    }
+
     private void onStateChange(ImagesViewState imagesViewState) {
         imagesView.renderState(imagesViewState);
     }
 
+    private void onPermissionRequestDenied() {
+        ImagesViewState permissionError = new ImagesViewState(ScreenState.ERROR, null,
+                "The location permission is required to use this app");
+        imagesView.renderState(permissionError);
+    }
 }

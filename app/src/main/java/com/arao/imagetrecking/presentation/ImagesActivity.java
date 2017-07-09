@@ -1,6 +1,12 @@
 package com.arao.imagetrecking.presentation;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +24,8 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class ImagesActivity extends AppCompatActivity implements ImagesView {
+
+    private static final int LOCATION_PERMISSIONS_REQUEST = 123;
 
     @Inject
     ImagesPresenter imagesPresenter;
@@ -48,6 +56,15 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == LOCATION_PERMISSIONS_REQUEST) {
+            imagesPresenter.onRequestPermissionResult(grantResults);
+        }
+    }
+
+    @Override
     public void renderState(ImagesViewState state) {
         switch (state.getScreenState()) {
             case INITIAL:
@@ -63,14 +80,33 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
                 loadingIndicator.setVisibility(GONE);
                 contentRecycler.setVisibility(VISIBLE);
                 imageUrlAdapter.setData(state.getImageUrls());
+                imageUrlAdapter.notifyItemInserted(0);
                 break;
             case ERROR:
+                Snackbar.make(findViewById(android.R.id.content),
+                        state.getErrorMessage(), Snackbar.LENGTH_LONG).show();
                 break;
         }
     }
 
+    @Override
+    public boolean isLocationPermissionGranted() {
+        int fineLocationPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        return fineLocationPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void requestLocationPermissions() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                LOCATION_PERMISSIONS_REQUEST);
+    }
+
     private void resolveDependencies() {
-        AppComponent appComponent = DaggerAppComponent.create();
+        AppComponent appComponent = DaggerAppComponent.builder()
+                .presentationModule(new PresentationModule(getApplicationContext()))
+                .build();
         appComponent.inject(this);
     }
 

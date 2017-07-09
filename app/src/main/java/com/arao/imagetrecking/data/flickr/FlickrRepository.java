@@ -22,7 +22,7 @@ class FlickrRepository implements ImageDataSource {
     }
 
     @Override
-    public Single<String> getImageUrlForLocation(int minLon, int minLat, int maxLon, int maxLat) {
+    public Single<String> getImageUrlForLocation(double minLon, double minLat, double maxLon, double maxLat) {
         String bBoxString = minLon + "," + minLat + "," + maxLon + "," + maxLat;
 
         return flickrService.getImageForLocation(BuildConfig.FLICKR_API_KEY, bBoxString, ITEMS_PER_PAGE,
@@ -32,19 +32,25 @@ class FlickrRepository implements ImageDataSource {
 
     @SuppressWarnings("StringBufferReplaceableByString")
     private SingleSource<String> processResponse(FlickrResponse flickrResponse) {
-        Photo photo = flickrResponse.getPhotos().get(0);
+        if (flickrResponse.getPhotos().size() > 0) {
+            Photo photo = flickrResponse.getPhotos().get(0);
 
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append("https://farm");
-        urlBuilder.append(photo.getFarm());
-        urlBuilder.append(".staticflickr.com/");
-        urlBuilder.append(photo.getServer());
-        urlBuilder.append("/");
-        urlBuilder.append(photo.getId());
-        urlBuilder.append("_");
-        urlBuilder.append(photo.getSecret());
-        urlBuilder.append(".jpg");
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.append("https://farm");
+            urlBuilder.append(photo.getFarm());
+            urlBuilder.append(".staticflickr.com/");
+            urlBuilder.append(photo.getServer());
+            urlBuilder.append("/");
+            urlBuilder.append(photo.getId());
+            urlBuilder.append("_");
+            urlBuilder.append(photo.getSecret());
+            urlBuilder.append(".jpg");
 
-        return Single.just(urlBuilder.toString());
+            return Single.just(urlBuilder.toString());
+        } else {
+            // TODO return error
+            return Single.just("");
+        }
     }
+
 }

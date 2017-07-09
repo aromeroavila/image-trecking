@@ -4,6 +4,6 @@ import io.reactivex.Single;
 
 public interface ImageDataSource {
 
-    Single<String> getImageUrlForLocation(int minLon, int maxLon, int minLat, int maxLat);
+    Single<String> getImageUrlForLocation(double minLon, double minLat, double maxLon, double maxLat);
 
 }

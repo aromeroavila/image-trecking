@@ -6,4 +6,8 @@ interface ImagesView {
 
     void renderState(ImagesViewState imagesViewState);
 
+    boolean isLocationPermissionGranted();
+
+    void requestLocationPermissions();
+
 }

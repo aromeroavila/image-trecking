@@ -9,7 +9,7 @@ import javax.inject.Inject;
 class VerticalSpaceItemDecoration extends RecyclerView.ItemDecoration {
 
     @Inject
-    public VerticalSpaceItemDecoration() {
+    VerticalSpaceItemDecoration() {
     }
 
     @Override
