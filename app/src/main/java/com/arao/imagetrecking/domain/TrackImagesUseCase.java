@@ -14,22 +14,20 @@ import io.reactivex.subjects.BehaviorSubject;
 @Singleton
 public class TrackImagesUseCase {
 
-    private static final double ACCURACY_FACTOR = 0.0005;
-    private static final int MIN_DISTANCE_LOCATION_UPDATE = 100;
-    private static final int EXPIRATION_TIME_LOCATION_UPDATE = 2 * 60 * 60 * 1000;
+    static final double ACCURACY_FACTOR = 0.0005;
+    static final int MIN_DISTANCE_LOCATION_UPDATE = 100;
+    static final int EXPIRATION_TIME_LOCATION_UPDATE = 2 * 60 * 60 * 1000;
 
-    private final BehaviorSubject<ImagesViewState> stateBehaviorSubject;
     private final ImageDataSource imageDataSource;
     private final LocationDataSource locationDataSource;
 
-    private Disposable locationDisposable;
+    private BehaviorSubject<ImagesViewState> stateBehaviorSubject = BehaviorSubject.create();
     private List<String> imageUrls = new ArrayList<>();
+    private Disposable locationDisposable;
 
     @Inject
-    TrackImagesUseCase(BehaviorSubject<ImagesViewState> stateBehaviorSubject,
-                       ImageDataSource imageDataSource,
+    TrackImagesUseCase(ImageDataSource imageDataSource,
                        LocationDataSource locationDataSource) {
-        this.stateBehaviorSubject = stateBehaviorSubject;
         this.imageDataSource = imageDataSource;
         this.locationDataSource = locationDataSource;
     }

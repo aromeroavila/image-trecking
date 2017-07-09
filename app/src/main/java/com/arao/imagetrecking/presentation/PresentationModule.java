@@ -28,7 +28,7 @@ public class PresentationModule {
     }
 
     @Provides
-    public Context activityContext() {
+    Context activityContext() {
         return context;
     }
 
