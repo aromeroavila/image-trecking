@@ -41,8 +41,9 @@ class ImagesPresenter {
     }
 
     void finalise() {
-        imagesView = null;
+        trackImagesUseCase.stopTrackingImages();
         stateDisposable.dispose();
+        imagesView = null;
     }
 
     void onRequestPermissionResult(int[] grantResults) {

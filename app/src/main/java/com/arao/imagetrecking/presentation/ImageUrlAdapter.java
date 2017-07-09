@@ -12,7 +12,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ImageUrlAdapter extends RecyclerView.Adapter<ImageViewHolder> {
+class ImageUrlAdapter extends RecyclerView.Adapter<ImageViewHolder> {
 
     private List<String> imageUrls;
 

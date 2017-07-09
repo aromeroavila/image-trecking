@@ -4,7 +4,7 @@ public enum ScreenState {
 
     INITIAL,
     IN_PROGRESS,
-    SUCESS,
+    SUCCESS,
     ERROR
 
 }

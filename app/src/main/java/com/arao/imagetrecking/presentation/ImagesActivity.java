@@ -78,7 +78,6 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-
         if (requestCode == LOCATION_PERMISSIONS_REQUEST) {
             imagesPresenter.onRequestPermissionResult(grantResults);
         }
@@ -91,6 +90,7 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
                 stopMenuItem.setVisible(false);
                 contentRecycler.setVisibility(GONE);
                 imageUrlAdapter.setData(state.getImageUrls());
+                imageUrlAdapter.notifyDataSetChanged();
                 startButton.setVisibility(VISIBLE);
                 loadingIndicator.setVisibility(GONE);
                 break;
@@ -98,7 +98,7 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
                 startButton.setVisibility(GONE);
                 loadingIndicator.setVisibility(VISIBLE);
                 break;
-            case SUCESS:
+            case SUCCESS:
                 stopMenuItem.setVisible(true);
                 startButton.setVisibility(GONE);
                 loadingIndicator.setVisibility(GONE);
@@ -107,6 +107,11 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
                 imageUrlAdapter.notifyItemInserted(0);
                 break;
             case ERROR:
+                if (loadingIndicator.getVisibility() == VISIBLE) {
+                    stopMenuItem.setVisible(false);
+                    startButton.setVisibility(VISIBLE);
+                    loadingIndicator.setVisibility(GONE);
+                }
                 Snackbar.make(findViewById(android.R.id.content),
                         state.getErrorMessage(), Snackbar.LENGTH_LONG).show();
                 break;
@@ -134,6 +139,7 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
         appComponent.inject(this);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void initViews() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

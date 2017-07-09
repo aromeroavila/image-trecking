@@ -15,7 +15,7 @@ class FlickrResponse {
     @ElementList(name = "photos")
     private List<Photo> photos;
 
-    public List<Photo> getPhotos() {
+    List<Photo> getPhotos() {
         return photos;
     }
 }

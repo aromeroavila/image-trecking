@@ -3,7 +3,7 @@ package com.arao.imagetrecking.data.flickr;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
-@Element(name="photo")
+@Element(name = "photo")
 class Photo {
 
     @Attribute(name = "id")
@@ -25,40 +25,20 @@ class Photo {
     @Attribute(name = "isfamily")
     private int isFamily;
 
-    public String getId() {
+    String getId() {
         return id;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
-    public String getSecret() {
+    String getSecret() {
         return secret;
     }
 
-    public int getServer() {
+    int getServer() {
         return server;
     }
 
-    public int getFarm() {
+    int getFarm() {
         return farm;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public int getIsPublic() {
-        return isPublic;
-    }
-
-    public int getIsFriend() {
-        return isFriend;
-    }
-
-    public int getIsFamily() {
-        return isFamily;
     }
 
 }

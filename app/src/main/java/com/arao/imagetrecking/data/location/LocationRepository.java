@@ -33,10 +33,9 @@ class LocationRepository extends LocationCallback implements LocationDataSource 
 
     @Override
     public Observable<Coordinate> getLocationUpdates(long expirationDuration, long minDistance) {
-
-        locationRequest.setSmallestDisplacement(minDistance)
-                .setInterval(1000 * 60 * 60)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setSmallestDisplacement(minDistance)
+                .setInterval(expirationDuration)
                 .setExpirationDuration(expirationDuration);
 
         try {

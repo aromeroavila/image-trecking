@@ -37,14 +37,16 @@ public class TrackImagesUseCase {
     public Observable<ImagesViewState> startTrackingImages() {
         stateBehaviorSubject.onNext(ImagesViewState.LOADING);
         locationDisposable = locationDataSource.getLocationUpdates(EXPIRATION_TIME_LOCATION_UPDATE, MIN_DISTANCE_LOCATION_UPDATE)
-                .subscribe(this::requestImageForLocation);
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(this::requestImageForLocation, this::processError);
         return stateBehaviorSubject;
     }
 
     public void stopTrackingImages() {
-        imageUrls.clear();
         locationDataSource.stopLocationUpdates();
         locationDisposable.dispose();
+        imageUrls.clear();
     }
 
     private void requestImageForLocation(Coordinate coordinate) {
@@ -59,12 +61,18 @@ public class TrackImagesUseCase {
         imageDataSource.getImageUrlForLocation(minLon, minLat, maxLon, maxLat)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(this::processResponse);
+                .subscribe(this::processResponse, this::processError);
     }
 
     private void processResponse(String url) {
         imageUrls.add(0, url);
-        ImagesViewState successResponse = new ImagesViewState(ScreenState.SUCESS, imageUrls, "");
+        ImagesViewState successResponse = new ImagesViewState(ScreenState.SUCCESS, imageUrls, "");
         stateBehaviorSubject.onNext(successResponse);
     }
+
+    private void processError(Throwable throwable) {
+        ImagesViewState errorResponse = new ImagesViewState(ScreenState.ERROR, null, throwable.getMessage());
+        stateBehaviorSubject.onNext(errorResponse);
+    }
+
 }

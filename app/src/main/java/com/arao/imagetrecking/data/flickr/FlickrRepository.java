@@ -6,7 +6,6 @@ import com.arao.imagetrecking.domain.ImageDataSource;
 import javax.inject.Inject;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 
 class FlickrRepository implements ImageDataSource {
 
@@ -31,7 +30,7 @@ class FlickrRepository implements ImageDataSource {
     }
 
     @SuppressWarnings("StringBufferReplaceableByString")
-    private SingleSource<String> processResponse(FlickrResponse flickrResponse) {
+    private Single<String> processResponse(FlickrResponse flickrResponse) {
         if (flickrResponse.getPhotos().size() > 0) {
             Photo photo = flickrResponse.getPhotos().get(0);
 
@@ -48,8 +47,7 @@ class FlickrRepository implements ImageDataSource {
 
             return Single.just(urlBuilder.toString());
         } else {
-            // TODO return error
-            return Single.just("");
+            throw new RuntimeException("There are no images available for the current location");
         }
     }
 
