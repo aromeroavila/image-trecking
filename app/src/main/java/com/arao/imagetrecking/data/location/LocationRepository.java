@@ -35,29 +35,21 @@ class LocationRepository extends LocationCallback implements LocationDataSource 
     public Observable<Coordinate> getLocationUpdates(long expirationDuration, long minDistance) {
 
         locationRequest.setSmallestDisplacement(minDistance)
-                .setInterval(1000 * 5)
+                .setInterval(1000 * 60 * 60)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setExpirationDuration(expirationDuration);
 
         try {
-            locationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    super.onLocationResult(locationResult);
-
-                    Location location = locationResult.getLastLocation();
-
-                    if (location != null) {
-                        double longitude = location.getLongitude();
-                        double latitude = location.getLatitude();
-                        coordinatePublishSubject.onNext(new Coordinate(longitude, latitude));
-                    }
-                }
-            }, null);
+            locationProviderClient.requestLocationUpdates(locationRequest, this, null);
         } catch (SecurityException e) {
             coordinatePublishSubject.onError(e);
         }
         return coordinatePublishSubject;
+    }
+
+    @Override
+    public void stopLocationUpdates() {
+        locationProviderClient.removeLocationUpdates(this);
     }
 
     @Override

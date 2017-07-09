@@ -6,4 +6,6 @@ public interface LocationDataSource {
 
     Observable<Coordinate> getLocationUpdates(long expirationDuration, long minDistance);
 
+    void stopLocationUpdates();
+
 }

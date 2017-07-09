@@ -10,6 +10,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
@@ -37,6 +40,7 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
     private Button startButton;
     private ProgressBar loadingIndicator;
     private RecyclerView contentRecycler;
+    private MenuItem stopMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,22 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_images_menu, menu);
+        stopMenuItem = menu.findItem(R.id.action_stop);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_stop) {
+            imagesPresenter.onStopButtonPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
@@ -68,6 +88,9 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
     public void renderState(ImagesViewState state) {
         switch (state.getScreenState()) {
             case INITIAL:
+                stopMenuItem.setVisible(false);
+                contentRecycler.setVisibility(GONE);
+                imageUrlAdapter.setData(state.getImageUrls());
                 startButton.setVisibility(VISIBLE);
                 loadingIndicator.setVisibility(GONE);
                 break;
@@ -76,6 +99,7 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
                 loadingIndicator.setVisibility(VISIBLE);
                 break;
             case SUCESS:
+                stopMenuItem.setVisible(true);
                 startButton.setVisibility(GONE);
                 loadingIndicator.setVisibility(GONE);
                 contentRecycler.setVisibility(VISIBLE);
@@ -111,6 +135,9 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
     }
 
     private void initViews() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         startButton = (Button) findViewById(R.id.start_button);
         startButton.setOnClickListener(v -> imagesPresenter.onStartButtonPressed());
         loadingIndicator = (ProgressBar) findViewById(R.id.loading_progress_bar);
@@ -119,5 +146,4 @@ public class ImagesActivity extends AppCompatActivity implements ImagesView {
         contentRecycler.addItemDecoration(itemDecoration);
         contentRecycler.setAdapter(imageUrlAdapter);
     }
-
 }

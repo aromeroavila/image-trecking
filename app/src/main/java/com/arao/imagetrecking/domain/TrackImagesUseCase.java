@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
@@ -21,6 +22,7 @@ public class TrackImagesUseCase {
     private final ImageDataSource imageDataSource;
     private final LocationDataSource locationDataSource;
 
+    private Disposable locationDisposable;
     private List<String> imageUrls = new ArrayList<>();
 
     @Inject
@@ -34,9 +36,15 @@ public class TrackImagesUseCase {
 
     public Observable<ImagesViewState> startTrackingImages() {
         stateBehaviorSubject.onNext(ImagesViewState.LOADING);
-        locationDataSource.getLocationUpdates(EXPIRATION_TIME_LOCATION_UPDATE, MIN_DISTANCE_LOCATION_UPDATE)
+        locationDisposable = locationDataSource.getLocationUpdates(EXPIRATION_TIME_LOCATION_UPDATE, MIN_DISTANCE_LOCATION_UPDATE)
                 .subscribe(this::requestImageForLocation);
         return stateBehaviorSubject;
+    }
+
+    public void stopTrackingImages() {
+        imageUrls.clear();
+        locationDataSource.stopLocationUpdates();
+        locationDisposable.dispose();
     }
 
     private void requestImageForLocation(Coordinate coordinate) {
@@ -59,5 +67,4 @@ public class TrackImagesUseCase {
         ImagesViewState successResponse = new ImagesViewState(ScreenState.SUCESS, imageUrls, "");
         stateBehaviorSubject.onNext(successResponse);
     }
-
 }

@@ -34,6 +34,12 @@ class ImagesPresenter {
         }
     }
 
+    void onStopButtonPressed() {
+        trackImagesUseCase.stopTrackingImages();
+        stateDisposable.dispose();
+        imagesView.renderState(ImagesViewState.INITIAL);
+    }
+
     void finalise() {
         imagesView = null;
         stateDisposable.dispose();
